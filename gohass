@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#Force Windowed mode
+mode=`gsettings get com.canonical.Unity8 usage-mode | sed -e "s/'//g"`
+if [ "$mode" = "Staged" ]; then
+  gsettings set com.canonical.Unity8 usage-mode Windowed
+else
+  gsettings set com.canonical.Unity8 usage-mode Windowed
+  #Staged
+fi
+
+#Launch Home Assistant
+browser="morph-browser"
+terminal="com.ubuntu.terminal_terminal_0.9.0"
+hass="/home/phablet/homeassistant/bin/hass"
+
+#Launch browser anyway
+sleep 20 && ubuntu-app-launch $browser &
+
+#Check local/remote shell
+if [ -n "$SSH_TTY" ]; then
+  #Launch Terminal (will trigger server start)
+  ubuntu-app-launch $terminal
+else
+  #Start Home Assistant as we are in Terminal
+  libertine-container-manager exec -c "$hass"
+fi
+
